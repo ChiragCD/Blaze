@@ -1,0 +1,25 @@
+print(|"Whoohoo!")
+
+func1(|)
+
+func1 (|) {
+    print(|)
+}
+
+assign(arg1(a|4), arg2(b, c | 4) |4.89)
+
+bssign(a,[a, dnotsign(z|x)]|c.b.a)
+
+while(cssign(d|e)){
+    pass(|)
+    {}
+    switch(c){
+        case d{}
+        case e{}
+    }
+    continue
+}
+
+ass(b|c){
+    pass(b.tru|true)
+}
