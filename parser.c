@@ -48,7 +48,7 @@ func_call * read_call (token * tokens, int * skip_tokens) {
             return NULL;
         }
         comma_flag = 0;
-        printf("%s %s %s\n", tokens[0].val, tokens[1].val, tokens[2].val);
+        // printf("%s %s %s\n", tokens[0].val, tokens[1].val, tokens[2].val);
         returnable * r = read_returnable(tokens + i, skip_tokens);
         if(*skip_tokens < 0) {
             free_call(call);

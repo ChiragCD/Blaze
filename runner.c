@@ -16,7 +16,7 @@ int main (int argc, char * argv[]) {
 
 	long filesize;
 	char * content = loadfile(argv[1], &filesize);
-	printf("%s\n", content);
+	// printf("%s\n", content);
 
 	long token_num = 0L;
 	token * tokens = tokenize(content, filesize, &token_num);
@@ -31,9 +31,9 @@ int main (int argc, char * argv[]) {
 		printf("Error\n");
 		return 0;
 	}
-	printf("Safe\n");
+	// printf("Safe\n");
 
-	display(*__main__action, 0);
+	// display(*__main__action, 0);
 	
 	namespace * global = generate_global_namespace();
 	citizen * cz_main = get_citizen(global, "__main__", NULL);
