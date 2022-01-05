@@ -61,7 +61,8 @@ void interpret_call (func_call * c, namespace * n_out) {
     for(int i = 0; i < c->num_references; i++) {
         citizen * cz = interpret_returnable(c->parameters[i], n);
         if(c->parameters[i]->type == IDENT) cz = shallow_copy(cz);
-        cz->variable->name = f->parameters[i];
+        if(cz->type == VARIABLE) cz->variable->name = f->parameters[i];
+        if(cz->type == FUNCTION) cz->function->name = f->parameters[i];
         cz->name = cz->variable->name;
         put_citizen(n, cz);
         members[i] = cz;
@@ -69,7 +70,8 @@ void interpret_call (func_call * c, namespace * n_out) {
     for(int i = c->num_references; i < c->num_references + c->num_values; i++) {
         citizen * cz = interpret_returnable(c->parameters[i], n);
         if(c->parameters[i]->type == IDENT || c->parameters[i]->type == FUNC) cz = deep_copy(cz);
-        cz->variable->name = f->parameters[i];
+        if(cz->type == VARIABLE) cz->variable->name = f->parameters[i];
+        if(cz->type == FUNCTION) cz->function->name = f->parameters[i];
         cz->name = cz->variable->name;
         put_citizen(n, cz);
         members[i] = cz;
@@ -79,6 +81,12 @@ void interpret_call (func_call * c, namespace * n_out) {
     else interpret_block(f->action, n);
 
     for(int i = 0; i < c->num_references + c->num_values; i++) del_citizen(n, members[i]);
+
+    for(int i = 0; i < c->num_references + c->num_values; i++) if(is_global) {
+        members[i]->name = NULL;
+        if(members[i]->type == VARIABLE) members[i]->variable->name = NULL;
+        if(members[i]->type == FUNCTION) members[i]->variable->name = NULL;
+    }
 
     for(int i = 0; i < c->num_references; i++) free_shallow_citizen(members[i]);
     for(int i = c->num_references; i < c->num_references + c->num_values; i++) free_citizen(members[i]);

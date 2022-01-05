@@ -42,6 +42,7 @@ int main (int argc, char * argv[]) {
 	call_func(cz_main->function, NULL, NULL);
 
 	free_block(__main__action);
+	clear_global_namespace(global);
 	purge_namespace(global);
 
 	return 0;

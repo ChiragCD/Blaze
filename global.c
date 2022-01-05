@@ -11,11 +11,11 @@ citizen * get_obj_citizen(var * variable, char * str) {
 	return NULL;
 }
 
-void assign (var * variable, val * value) {
+void assign(var * variable, val * value) {
 	variable -> value = value;
 }
 
-val * copy_val (val * source) {
+val * copy_val(val * source) {
 	val * v = (val *) malloc(sizeof(val));
 	v->size = source->size;
 	v->value = (char *) malloc(v->size * sizeof(char));
@@ -61,7 +61,7 @@ citizen * deep_copy(citizen * source) {
 	return cz;
 }
 
-int truth_value (var * v) {
+int truth_value(var * v) {
 	if(v->value && v->value->value[0]) return 1;
 	return 0;
 }
@@ -135,10 +135,11 @@ citizen * generate_global_func(char * name, int num_references, int num_values, 
 	return cz;
 }
 
-namespace * generate_global_namespace () {
+namespace * generate_global_namespace() {
 	namespace * n = (namespace *) malloc(sizeof(namespace));
     for(int i = 0; i < 64; i++) n->buckets[i] = NULL;
 	n->outer = NULL;
+	n->num_elements = 0;
 	citizen * cz;
 	cz = generate_global_func("print", 0, 0, "|");
 	put_citizen(n, cz);
@@ -149,4 +150,20 @@ namespace * generate_global_namespace () {
 	cz = generate_global_func("assign", 1, 1, "variable|value|");
 	put_citizen(n, cz);
 	return n;
+}
+
+void clear_global_namespace(namespace * n) {
+	for(int i = 0; i < 64; i++) {
+        if(n->num_elements == 0) break;
+        holder * h = n->buckets[i];
+        while(h) {
+			if(h->value->type == FUNCTION) {
+				func * f = h->value->function;
+				free(f->name);
+				for(int j = 0; j < (f->num_references + f->num_values); j++) free(f->parameters[j]);
+				free(f->parameters);
+			}
+            h = h->next;
+        }
+    }
 }

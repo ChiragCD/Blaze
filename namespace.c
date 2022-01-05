@@ -13,7 +13,7 @@ int hash(char * str) {
     return h;
 }
 
-func * get_callable (namespace * n, char * str, int num_references, int num_values, int * is_global) {
+func * get_callable(namespace * n, char * str, int num_references, int num_values, int * is_global) {
     if(is_global) {
         if(n->outer) *is_global = 0;
         else *is_global = 1;
@@ -39,7 +39,7 @@ func * get_callable (namespace * n, char * str, int num_references, int num_valu
     return f;
 }
 
-citizen * get_citizen (namespace * n, char * str, int * is_global) {
+citizen * get_citizen(namespace * n, char * str, int * is_global) {
     if(is_global) {
         if(n->outer) *is_global = 0;
         else *is_global = 1;
@@ -57,7 +57,7 @@ citizen * get_citizen (namespace * n, char * str, int * is_global) {
     return cz;
 }
 
-void del_citizen (namespace * n, citizen * cz) {
+void del_citizen(namespace * n, citizen * cz) {
     int bucket_num = hash(cz->name);
     holder * h = n->buckets[bucket_num];
     while(h) {
@@ -75,7 +75,7 @@ void del_citizen (namespace * n, citizen * cz) {
     return;
 }
 
-void put_citizen (namespace * n, citizen * cz) {
+void put_citizen(namespace * n, citizen * cz) {
     int bucket_num = hash(cz->name);
     holder * h = (holder *) malloc(sizeof(holder));
     h->value = cz;
@@ -88,7 +88,7 @@ void put_citizen (namespace * n, citizen * cz) {
     return;
 }
 
-void purge_namespace (namespace * n) {
+void purge_namespace(namespace * n) {
     for(int i = 0; i < 64; i++) {
         if(n->num_elements == 0) break;
         while(n->buckets[i]) {

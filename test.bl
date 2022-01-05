@@ -3,7 +3,9 @@ This file contains Blaze code to run with the interpreter.
 """
 
 print(|"Whoohoo!")
+print(|"Hehehe")
 
+func1(|)
 func1(|)
 
 func1 (|) {
