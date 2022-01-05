@@ -1,7 +1,6 @@
 #ifndef NAMESPACE_H
 #define NAMESPACE_H
 
-typedef enum identifier_type identifier_type;
 typedef struct holder holder;
 typedef struct namespace namespace;
 

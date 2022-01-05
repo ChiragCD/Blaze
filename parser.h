@@ -15,6 +15,7 @@ typedef struct block block;
 
 #include "scanner.h"
 #include "namespace.h"
+#include "release.h"
 
 struct func_call {
     identifier * func_name;
@@ -48,10 +49,12 @@ enum parameter {
 
 struct returnable {
     parameter type;
-    func_call * returned;
-    identifier * value;
-    collection * array;
-    token * constant;
+    union {
+        func_call * returned;
+        identifier * value;
+        collection * array;
+        token * constant;
+    };
 };
 
 struct conditional {
@@ -73,11 +76,13 @@ enum statement_type {
 
 struct statement {
     statement_type type;
-    func_call * call;
-    func_def * def;
-    conditional * cond;
-    loop * loop;
-    block * blk;
+    union {
+        func_call * call;
+        func_def * def;
+        conditional * cond;
+        loop * loop;
+        block * blk;
+    };
 };
 
 struct block {
@@ -88,7 +93,5 @@ struct block {
 
 block * read_block (token * tokens, int * error);
 void display(block b, int forward);
-
-#include "release.h"
 
 #endif

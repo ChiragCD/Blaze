@@ -1,3 +1,7 @@
+"""
+This file contains Blaze code to run with the interpreter.
+"""
+
 print(|"Whoohoo!")
 
 func1(|)

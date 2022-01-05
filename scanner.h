@@ -14,8 +14,6 @@ typedef struct token {
 	long size;
 } token;
 
-typedef token * token_array;
-
 token * tokenize (char * content, long length, long * token_number);
 
 #endif

@@ -37,8 +37,10 @@ enum citizen_type {
 struct citizen {
 	citizen_type type;
 	char * name;
-	var * variable;
-	func * function;
+	union {
+		var * variable;
+		func * function;
+	};
 };
 
 citizen * get_obj_citizen(var * variable, char * str);

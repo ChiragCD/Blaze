@@ -156,7 +156,7 @@ func_def * read_def (token * tokens, int * skip_tokens) {
     strcpy(d->func_name, f->func_name->attrs[0]);
     d->num_references = f->num_references;
     d->num_values = f->num_values;
-    d->parameters = (char **) malloc(d->num_references + d->num_values * sizeof(char *));
+    d->parameters = (char **) malloc((d->num_references + d->num_values) * sizeof(char *));
     for(int i = 0; i < f->num_references; i++) {
         int l = strlen(f->parameters[i]->value->attrs[0]) + 1;
         d->parameters[i] = (char *) malloc(l * sizeof(char));
