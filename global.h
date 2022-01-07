@@ -56,6 +56,6 @@ int truth_value(var * v);
 void call_global(char * name, int num_references, int num_values, namespace * n);
 
 namespace * generate_global_namespace();
-void clear_global_namespace(namespace * n);
+void clean_global_namespace(namespace * n);
 
 #endif

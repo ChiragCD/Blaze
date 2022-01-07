@@ -84,6 +84,7 @@ void free_block(block * b) {
     if(!b) return;
     for(int i = 0; i < b->num_statements; i++) free_statement(b->statements[i]);
     free(b->statements);
+    purge_namespace(b->names);
     free(b);
 }
 
@@ -107,6 +108,7 @@ void free_var(var * v) {
 
 void free_shallow_var(var * v) {
     if(!v) return;
+    free(v->name);
     free(v->citizens);
     free(v);
 }

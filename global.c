@@ -128,7 +128,12 @@ citizen * generate_global_func(char * name, int num_references, int num_values, 
 	strcpy(cz->function->name, name);
 	cz->name = cz->function->name;
 
-	cz->function->outer = NULL;
+	namespace * n = (namespace *) malloc(sizeof(namespace));
+    for(int i = 0; i < 64; i++) n->buckets[i] = NULL;
+	n->outer = NULL;
+	n->num_elements = 0;
+
+	cz->function->outer = n;
 	cz->function->num_references = num_references;
 	cz->function->num_values = num_values;
 	cz->function->parameters = get_parameters(params, num_references + num_values);
@@ -152,7 +157,7 @@ namespace * generate_global_namespace() {
 	return n;
 }
 
-void clear_global_namespace(namespace * n) {
+void clean_global_namespace(namespace * n) {
 	for(int i = 0; i < 64; i++) {
         if(n->num_elements == 0) break;
         holder * h = n->buckets[i];
@@ -162,6 +167,7 @@ void clear_global_namespace(namespace * n) {
 				free(f->name);
 				for(int j = 0; j < (f->num_references + f->num_values); j++) free(f->parameters[j]);
 				free(f->parameters);
+				purge_namespace(f->outer);
 			}
             h = h->next;
         }

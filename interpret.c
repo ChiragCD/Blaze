@@ -6,20 +6,39 @@
 void interpret_block(block * b, namespace * n);
 citizen * interpret_returnable(returnable * r, namespace * n);
 
-void call_func (func * f, citizen * parameters, int * is_global) {
-    namespace * n = (namespace *) malloc(sizeof(namespace));
-    for(int i = 0; i < 64; i++) n->buckets[i] = NULL;
+void call_func(func * f, citizen * parameters, int is_global) {
+    namespace * n = f->action->names;
     n->outer = f->outer;
-    n->num_elements = 0;
+
+    for(int i = 0; i < f->num_references; i++) {
+        citizen * old_cz = get_citizen(n, f->parameters[i], NULL);
+        if(old_cz == NULL) continue;
+        del_citizen(n, old_cz);
+        old_cz->name = NULL;
+        if(old_cz->type == VARIABLE) old_cz->variable->name = NULL;
+        if(old_cz->type == FUNCTION) old_cz->function->name = NULL;
+        free_shallow_citizen(old_cz);
+    }
+
+    for(int i = 0; i < f->num_references + f->num_values; i++) {
+        citizen * old_cz = get_citizen(n, f->parameters[i], NULL);
+        if(old_cz == NULL) continue;
+        del_citizen(n, old_cz);
+        old_cz->name = NULL;
+        if(old_cz->type == VARIABLE) old_cz->variable->name = NULL;
+        if(old_cz->type == FUNCTION) old_cz->function->name = NULL;
+        free_citizen(old_cz);
+    }
+
+    if(n->num_elements) {
+        printf("Error - Unremoved elements in namespace, %s\n", f->name);
+        return;
+    }
 
     for(int i = 0; i < f->num_references + f->num_values; i++) put_citizen(n, parameters + i);
     
     if(is_global) call_global(f->name, f->num_references, f->num_values, n);
     else interpret_block(f->action, n);
-
-    for(int i = 0; i < f->num_references + f->num_values; i++) del_citizen(n, parameters + i);
-    if(n->num_elements) printf("Error - Unremoved elements in namespace\n");
-    free(n);
 }
 
 void interpret_call (func_call * c, namespace * n_out) {
@@ -51,12 +70,40 @@ void interpret_call (func_call * c, namespace * n_out) {
         f = cz->function;
     }
 
-    namespace * n = (namespace *) malloc(sizeof(namespace));
-    for(int i = 0; i < 64; i++) n->buckets[i] = NULL;
-    n->outer = f->outer;
-    n->num_elements = 0;
+    namespace * n;
+    if(is_global) {
+        n = f->outer;
+        n->outer = NULL;
+    }
+    else {
+        n = f->action->names;
+        n->outer = f->outer;
+    }
 
-    citizen * members[f->num_references + f->num_values];
+    for(int i = 0; i < c->num_references; i++) {
+        citizen * old_cz = get_citizen(n, f->parameters[i], NULL);
+        if(old_cz == NULL) continue;
+        del_citizen(n, old_cz);
+        old_cz->name = NULL;
+        if(old_cz->type == VARIABLE) old_cz->variable->name = NULL;
+        if(old_cz->type == FUNCTION) old_cz->function->name = NULL;
+        free_shallow_citizen(old_cz);
+    }
+
+    for(int i = 0; i < c->num_references + c->num_values; i++) {
+        citizen * old_cz = get_citizen(n, f->parameters[i], NULL);
+        if(old_cz == NULL) continue;
+        del_citizen(n, old_cz);
+        old_cz->name = NULL;
+        if(old_cz->type == VARIABLE) old_cz->variable->name = NULL;
+        if(old_cz->type == FUNCTION) old_cz->function->name = NULL;
+        free_citizen(old_cz);
+    }
+
+    if(n->num_elements) {
+        printf("Error - Unremoved elements in namespace, %s\n", c->func_name->attrs[0]);
+        return;
+    }
 
     for(int i = 0; i < c->num_references; i++) {
         citizen * cz = interpret_returnable(c->parameters[i], n);
@@ -65,7 +112,6 @@ void interpret_call (func_call * c, namespace * n_out) {
         if(cz->type == FUNCTION) cz->function->name = f->parameters[i];
         cz->name = cz->variable->name;
         put_citizen(n, cz);
-        members[i] = cz;
     }
     for(int i = c->num_references; i < c->num_references + c->num_values; i++) {
         citizen * cz = interpret_returnable(c->parameters[i], n);
@@ -74,26 +120,11 @@ void interpret_call (func_call * c, namespace * n_out) {
         if(cz->type == FUNCTION) cz->function->name = f->parameters[i];
         cz->name = cz->variable->name;
         put_citizen(n, cz);
-        members[i] = cz;
     }
 
     if(is_global) call_global(f->name, c->num_references, c->num_values, n);
     else interpret_block(f->action, n);
 
-    for(int i = 0; i < c->num_references + c->num_values; i++) del_citizen(n, members[i]);
-
-    for(int i = 0; i < c->num_references + c->num_values; i++) if(is_global) {
-        members[i]->name = NULL;
-        if(members[i]->type == VARIABLE) members[i]->variable->name = NULL;
-        if(members[i]->type == FUNCTION) members[i]->variable->name = NULL;
-    }
-
-    for(int i = 0; i < c->num_references; i++) free_shallow_citizen(members[i]);
-    for(int i = c->num_references; i < c->num_references + c->num_values; i++) free_citizen(members[i]);
-
-    if(n->num_elements) printf("Error - Unremoved elements in namespace, %s\n", c->func_name->attrs[0]);
-
-    free(n);
 }
 
 citizen * interpret_def(func_def * d, namespace * n) {
@@ -122,9 +153,7 @@ void interpret_block(block * b, namespace * n) {
     for(int i = 0; i < b->num_statements; i++) if(b->statements[i]->type == FUNC_DEF) num_funcs++;
     citizen * funcs[num_funcs];
     for(int i = 0; i < b->num_statements; i++) if(b->statements[i]->type == FUNC_DEF) funcs[temp++] = interpret_def(b->statements[i]->def, n);
-    for(int i = 0; i < b->num_statements; i++) {
-        interpret_statement(b->statements[i], n);
-    }
+    for(int i = 0; i < b->num_statements; i++) interpret_statement(b->statements[i], n);
     for(int i = 0; i < num_funcs; i++) del_citizen(n, funcs[i]);
     for(int i = 0; i < num_funcs; i++) free_citizen(funcs[i]);
 }

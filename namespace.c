@@ -89,11 +89,15 @@ void put_citizen(namespace * n, citizen * cz) {
 }
 
 void purge_namespace(namespace * n) {
+    if(!n) return;
     for(int i = 0; i < 64; i++) {
         if(n->num_elements == 0) break;
         while(n->buckets[i]) {
             holder * h = n->buckets[i];
             n->buckets[i] = h->next;
+            h->value->name = NULL;
+            if(h->value->type == VARIABLE) h->value->variable->name = NULL;
+            if(h->value->type == FUNCTION) h->value->function->name = NULL;
             free_citizen(h->value);
             free(h);
         }

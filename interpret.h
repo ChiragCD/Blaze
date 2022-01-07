@@ -4,6 +4,6 @@
 #include "global.h"
 
 void interpret_block(block * b, namespace * n);
-void call_func(func * f, citizen * parameters, int * is_global);
+void call_func(func * f, citizen * parameters, int is_global);
 
 #endif

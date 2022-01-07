@@ -21,3 +21,8 @@ To be done-
 Implementing conditionals and loops  
 Most library functions  
 Cleaning up this README  
+
+Planned Concepts -
+Allow for function arguments to be filled independently, and for a call to be triggered by anyone with the function's reference.
+Separate function's block and outer namespace as value, independently modifiable after a deep copy.
+Make multi-interpreter multi-processing, with a separate shared namespace with a lock system handled by a server over ports.

@@ -448,6 +448,12 @@ block * read_block(token * tokens, int * skip_tokens) {
     block * b = (block *) malloc(sizeof(block));
     b->num_statements = 0;
     b->statements = (statement **) malloc(0);
+
+    b->names = (namespace *) malloc(sizeof(namespace));
+    for(int i = 0; i < 64; i++) b->names->buckets[i] = NULL;
+    b->names->num_elements = 0;
+    b->names->outer = NULL;
+
     while(tokens[i].lex != RIGHT_BRACE) {
         statement * s = read_statement(tokens + i, skip_tokens);
         if(*skip_tokens < 0) {
